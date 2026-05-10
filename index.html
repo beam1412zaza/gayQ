@@ -108,6 +108,58 @@
                 font-size:60px;
             }
         }
+
+        #heart-counter{
+            position:absolute;
+            top:20px;
+            right:20px;
+            z-index:3;
+            color:#ff7fa7;
+            font-size:22px;
+            font-weight:700;
+            text-shadow:0 0 12px rgba(255,127,167,0.85);
+            padding:12px 18px;
+            border:1px solid rgba(255,127,167,0.4);
+            border-radius:999px;
+            background:rgba(0,0,0,0.35);
+            backdrop-filter:blur(10px);
+        }
+
+        .heart-floating{
+            position:absolute;
+            pointer-events:auto;
+            font-size:2rem;
+            animation: floatUp linear forwards;
+            text-shadow:0 0 12px rgba(255, 75, 130, 0.9);
+            transform-origin:center;
+            cursor:pointer;
+            user-select:none;
+        }
+
+        .heart-floating:hover{
+            transform:scale(1.2);
+        }
+
+        .heart-floating.collected{
+            animation:none;
+            transition:transform 0.2s ease, opacity 0.2s ease;
+            transform:scale(1.4);
+            opacity:0;
+        }
+
+        @keyframes floatUp{
+            0%{
+                transform:translateY(0) scale(1);
+                opacity:0;
+            }
+            20%{
+                opacity:1;
+            }
+            100%{
+                transform:translateY(-120vh) scale(0.8);
+                opacity:0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -120,6 +172,8 @@
     <div class="star" style="top:20%; left:90%;"></div>
     <div class="star" style="top:70%; left:10%;"></div>
 
+    <div id="heart-counter">แตะหัวใจได้ 0</div>
+
     <h1>
         เกคิว<br>
         แต่งงานกับ<br>
@@ -128,5 +182,46 @@
         เกวสัน
     </h1>
 
+    <script>
+        const body = document.body;
+        const counterEl = document.getElementById('heart-counter');
+        let heartCount = 0;
+
+        function updateCounter(){
+            counterEl.textContent = `แตะหัวใจได้ ${heartCount}`;
+        }
+
+        function createHeart(){
+            const heart = document.createElement('div');
+            heart.className = 'heart-floating';
+            heart.textContent = '❤️';
+            const size = Math.round(24 + Math.random() * 20);
+            heart.style.fontSize = `${size}px`;
+            heart.style.left = `${Math.random() * 80 + 10}%`;
+            heart.style.bottom = '-5%';
+            heart.style.animationDuration = `${6 + Math.random() * 4}s`;
+            heart.style.opacity = '0';
+
+            heart.addEventListener('click', event => {
+                event.stopPropagation();
+                if (heart.classList.contains('collected')) return;
+                heartCount += 1;
+                updateCounter();
+                heart.classList.add('collected');
+                setTimeout(() => heart.remove(), 200);
+            });
+
+            body.appendChild(heart);
+            const lifetime = parseFloat(heart.style.animationDuration) * 1000;
+            setTimeout(() => {
+                if (body.contains(heart)) heart.remove();
+            }, lifetime + 400);
+        }
+
+        updateCounter();
+        createHeart();
+        createHeart();
+        setInterval(createHeart, 900);
+    </script>
 </body>
 </html>
